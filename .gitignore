@@ -1,0 +1,8 @@
+# служебные файлы
+*.log
+*.pyc
+__pycache__/
+Thumbs.db
+.DS_Store
+*.tmp
+~$*
