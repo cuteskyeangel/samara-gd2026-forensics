@@ -17,6 +17,7 @@ function filteredData(mode){
   return ORIG.filter(function(t){ return !(mode === 'clean' && isRing(t)); }).map(function(t){
     if (isRing(t)) return t;
     var cd = t.customdata || [];
+    if (!cd.length) return t;   // трейсы без флага (гистограммы и пр.) не трогаем
     var x = [], y = [], txt = [];
     for (var i = 0; i < cd.length; i++){
       var keep = (mode === 'all') || (mode === 'anom' ? cd[i] === 1 : cd[i] === 0);
