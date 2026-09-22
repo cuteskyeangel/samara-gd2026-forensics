@@ -12,7 +12,7 @@ function visFor(tr, mode){
   var n = tr.name || '';
   if (n.indexOf('аномальные УИК — ') === 0) return mode === 'clean' ? 'legendonly' : true;   // кольца
   if (n.indexOf('аномальные точки — ') === 0) return mode === 'anom';                        // точки-аномалии
-  return mode === 'all';                                                                     // обычные трейсы
+  return mode !== 'anom';                                                                     // обычные трейсы: во всех режимах, кроме «только аномальные»
 }
 function applyMode(num){
   var mode = gmode[num] || 'all';
