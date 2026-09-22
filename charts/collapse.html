@@ -1,6 +1,38 @@
 <!DOCTYPE html><html><head><meta charset="utf-8">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<style>body{margin:0;background:#fff}</style></head><body>
+<style>body{margin:0;background:#fff}
+.btn{margin:2px 6px 2px 0;padding:4px 14px;cursor:pointer;border:1px solid #888;background:#fff;border-radius:4px;font-size:13px}
+.btn.r{color:#d0212a;border-color:#d0212a} .btn.b{color:#0e5aa7;border-color:#0e5aa7}
+.btn.on.r{background:#d0212a;color:#fff} .btn.on.b{background:#0e5aa7;color:#fff}
+</style></head><body>
+<div>
+<button class="btn r" id="b1" onclick="setMode(this.className.indexOf('on')<0?'anom':'all')">Показать только аномальные УИК</button>
+<button class="btn b" id="b2" onclick="setMode(this.className.indexOf('on')<0?'clean':'all')">Убрать аномальные УИК</button>
+</div>
 <div id="c" style="width:100%"></div>
-<script>var data=[{"x": ["№162 Жигулевский", "№161 Красноглинский", "№163 Промышленный", "№159 Самарский", "№160 Тольяттинский"], "y": [15.1, 19.3, 39.1, 18.6, 23.1], "type": "bar", "marker": {"color": "#2e7d32"}, "name": "город (медиана)"}, {"x": ["№162 Жигулевский", "№161 Красноглинский", "№163 Промышленный", "№159 Самарский", "№160 Тольяттинский"], "y": [4.6, 5.1, 13.3, 6.0, 0.4], "type": "bar", "marker": {"color": "#d0212a"}, "name": "село, явка>80% (медиана)"}]; Plotly.newPlot('c', data, {"width": 1100, "height": 460, "barmode": "group", "title": "Обвал оппозиции на сельских высоко-явочных УИК (медианы по округам)", "yaxis": {"title": "Медианный % оппозиционера"}, "bargap": 0.25}, {displaylogo:false, responsive:true});</script>
+<script>
+var ORIG = [{"x": ["№162 Жигулевский", "№161 Красноглинский", "№163 Промышленный", "№159 Самарский", "№160 Тольяттинский"], "y": [15.1, 19.3, 39.1, 18.6, 23.1], "type": "bar", "marker": {"color": "#2e7d32"}, "name": "город (медиана)"}, {"x": ["№162 Жигулевский", "№161 Красноглинский", "№163 Промышленный", "№159 Самарский", "№160 Тольяттинский"], "y": [4.6, 5.1, 13.3, 6.0, 0.4], "type": "bar", "marker": {"color": "#d0212a"}, "name": "село, явка>80% (медиана)"}], LAYOUT = {"width": 1100, "height": 460, "barmode": "group", "title": "Обвал оппозиции на сельских высоко-явочных УИК (медианы по округам)", "yaxis": {"title": "Медианный % оппозиционера"}, "bargap": 0.25};
+function isRing(t){ return t.name && t.name.indexOf('аномальные УИК — ') === 0; }
+function filteredData(mode){
+  return ORIG.filter(function(t){ return !(mode === 'clean' && isRing(t)); }).map(function(t){
+    if (isRing(t)) return t;
+    var cd = t.customdata || [];
+    var x = [], y = [], txt = [];
+    for (var i = 0; i < cd.length; i++){
+      var keep = (mode === 'all') || (mode === 'anom' ? cd[i] === 1 : cd[i] === 0);
+      if (keep){ x.push(t.x[i]); y.push(t.y[i]); if (t.text) txt.push(t.text[i]); }
+    }
+    var nt = Object.assign({}, t);
+    nt.x = x; nt.y = y; if (t.text) nt.text = txt;
+    if (mode === 'anom') nt.marker = Object.assign({}, t.marker, {size: 9, opacity: .95});
+    return nt;
+  });
+}
+function setMode(m){
+  Plotly.react('c', filteredData(m), LAYOUT, {displaylogo:false, responsive:true});
+  document.getElementById('b1').className = 'btn r' + (m === 'anom' ? ' on' : '');
+  document.getElementById('b2').className = 'btn b' + (m === 'clean' ? ' on' : '');
+}
+setMode('all');
+</script>
 </body></html>
